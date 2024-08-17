@@ -9,7 +9,8 @@ export class CalculatorService {
   
   add(input: string): number {
     if (!input) return 0;
-    return parseInt(input);
-  }  
+    const numbers = input.split(',').map(num => parseInt(num));
+    return numbers.reduce((acc, curr) => acc + curr, 0);
+  }
   
 }
