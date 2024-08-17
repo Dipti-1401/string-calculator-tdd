@@ -1,23 +1,49 @@
 <div class="container">
   <h1>String Calculator</h1>
-  <p class="instructions">Enter a string of numbers separated by commas, newlines, or a custom delimiter to calculate their sum.</p>
-  
+  <p class="instructions">
+    Enter a string of numbers separated by commas, newlines, or a custom
+    delimiter to calculate their sum.
+  </p>
+
   <form (ngSubmit)="calculate()" aria-describedby="instructions">
     <div class="input-group">
       <label for="numbers">Enter numbers:</label>
-      <input id="numbers" type="text" [(ngModel)]="input" name="input" required aria-required="true" />
-      <button type="submit" [disabled]="isLoading">Calculate</button>
+      <input
+        id="numbers"
+        type="text"
+        [(ngModel)]="input"
+        name="input"
+        required
+        aria-required="true"
+        #numbers="ngModel"
+        placeholder="e.g., 1,2,3 or //;\n1;2"
+      />
+      <div *ngIf="numbers.invalid && numbers.touched" class="error-message">
+        Please enter a valid string of numbers.
+      </div>
+      <button
+        type="submit"
+        [disabled]="isLoading || numbers.invalid"
+        [attr.aria-busy]="isLoading"
+      >
+        Calculate
+      </button>
     </div>
   </form>
 
-  <div *ngIf="isLoading" class="loading">Calculating...</div>
+  <div *ngIf="isLoading" class="loading" role="status" aria-live="polite">
+    <div class="spinner"></div>
+    Calculating...
+  </div>
 
-  <div *ngIf="result !== null" class="result">
-    <h2>Result: {{ result }}</h2>
+  <div *ngIf="result !== null" class="result" aria-live="polite">
+    <h2>
+      Result: <output>{{ result }}</output>
+    </h2>
     <button (click)="reset()">Reset</button>
   </div>
 
-  <div *ngIf="error" class="error">
+  <div *ngIf="error" class="error" aria-live="assertive">
     <h2>Error: {{ error }}</h2>
     <button (click)="reset()">Reset</button>
   </div>

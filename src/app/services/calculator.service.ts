@@ -4,14 +4,16 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class CalculatorService {
+  private static readonly DEFAULT_DELIMITERS = /[\n,]/;
+
   constructor() {}
 
   add(input: string): number {
     if (this.isEmpty(input)) return 0;
 
     const { delimiters, numbers } = this.parseInput(input);
-    const numberList = this.splitAndConvertToNumbers(numbers, delimiters);
-    
+    const numberList = this.splitStringIntoNumbers(numbers, delimiters);
+
     this.validateNoNegativeNumbers(numberList);
 
     return this.calculateSum(numberList);
@@ -21,36 +23,52 @@ export class CalculatorService {
     return !input || input.trim().length === 0;
   }
 
-  private parseInput(input: string): { delimiters: RegExp, numbers: string } {
-    let delimiters = /[\n,]/;
-
+  private parseInput(input: string): { delimiters: RegExp; numbers: string } {
     if (input.startsWith('//')) {
       const delimiterEnd = input.indexOf('\n');
-      let delimiterSection = input.substring(2, delimiterEnd);
+      const delimiterSection = input.substring(2, delimiterEnd).trim();
 
-      if (delimiterSection.startsWith('[') && delimiterSection.endsWith(']')) {
-        delimiterSection = delimiterSection.slice(1, -1);
-        const delimiterList = delimiterSection.split('][');
-        delimiters = new RegExp(delimiterList.map(del => this.escapeRegExp(del)).join('|'));
-      } else {
-        delimiters = new RegExp(this.escapeRegExp(delimiterSection));
+      if (delimiterSection.startsWith('[') && !delimiterSection.endsWith(']')) {
+        throw new Error(`Invalid delimiter section: ${delimiterSection}`);
       }
 
-      input = input.substring(delimiterEnd + 1);
+      const delimiters =
+        delimiterSection === ''
+          ? CalculatorService.DEFAULT_DELIMITERS
+          : delimiterSection.startsWith('[')
+          ? this.parseCustomDelimiters(delimiterSection)
+          : new RegExp(this.escapeRegExp(delimiterSection));
+
+      return { delimiters, numbers: input.substring(delimiterEnd + 1) };
     }
 
-    return { delimiters, numbers: input };
+    return { delimiters: CalculatorService.DEFAULT_DELIMITERS, numbers: input };
   }
 
-  private splitAndConvertToNumbers(numbers: string, delimiters: RegExp): number[] {
+  private parseCustomDelimiters(delimiterSection: string): RegExp {
+    const delimiterList = delimiterSection.slice(1, -1).split('][');
+    return new RegExp(delimiterList.map(this.escapeRegExp).join('|'));
+  }
+
+  private splitStringIntoNumbers(
+    numbers: string,
+    delimiters: RegExp
+  ): number[] {
     return numbers
       .split(delimiters)
-      .map(num => parseInt(num, 10))
-      .filter(num => !isNaN(num));
+      .map((num) => num.trim())
+      .filter((num) => num !== '')
+      .map((num) => {
+        const parsedNum = parseInt(num, 10);
+        if (isNaN(parsedNum)) {
+          throw new Error(`Invalid input: ${num}`);
+        }
+        return parsedNum;
+      });
   }
 
   private validateNoNegativeNumbers(numbers: number[]): void {
-    const negatives = numbers.filter(num => num < 0);
+    const negatives = numbers.filter((num) => num < 0);
     if (negatives.length > 0) {
       throw new Error(`Negatives not allowed: ${negatives.join(', ')}`);
     }
@@ -60,7 +78,7 @@ export class CalculatorService {
     return numbers.reduce((sum, num) => sum + num, 0);
   }
 
-  private escapeRegExp(string: string): string {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  private escapeRegExp(delimiter: string): string {
+    return delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 }

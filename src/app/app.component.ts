@@ -8,11 +8,10 @@ import { CommonModule } from '@angular/common';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   standalone: true,
-  imports: [FormsModule, CommonModule], // Ensure FormsModule is imported here
+  imports: [FormsModule, CommonModule],
 })
 export class AppComponent {
   title = 'string-calculator-tdd';
-
   input = '';
   result: number | null = null;
   error: string | null = null;
