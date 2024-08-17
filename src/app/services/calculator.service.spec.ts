@@ -2,11 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { CalculatorService } from './calculator.service';
 
 describe('CalculatorService', () => {
-  let service: CalculatorService;  // Ensure 'service' is declared here
+  let service: CalculatorService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(CalculatorService);  // Initialize 'service' here
+    service = TestBed.inject(CalculatorService);
   });
 
   it('should return 0 for an empty string', () => {
@@ -32,6 +32,10 @@ describe('CalculatorService', () => {
   it('should support different delimiters defined in the input', () => {
     expect(service.add('//;\n1;2')).toBe(3);
   });
-  
-  
+
+  it('should throw an error for negative numbers', () => {
+    expect(() => service.add('1,-2,3')).toThrow(
+      new Error('Negatives not allowed: -2')
+    );
+  });
 });
