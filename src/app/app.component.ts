@@ -11,6 +11,8 @@ import { CommonModule } from '@angular/common';
   imports: [FormsModule, CommonModule], // Ensure FormsModule is imported here
 })
 export class AppComponent {
+  title = 'string-calculator-tdd';
+
   input = '';
   result: number | null = null;
   error: string | null = null;
