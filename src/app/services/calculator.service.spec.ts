@@ -24,6 +24,10 @@ describe('CalculatorService', () => {
   it('should handle multiple numbers', () => {
     expect(service.add('1,2,3,4')).toBe(10);
   });
+
+  it('should handle newlines between numbers as well as commas', () => {
+    expect(service.add('1\n2,3')).toBe(6);
+  });
   
   
 
