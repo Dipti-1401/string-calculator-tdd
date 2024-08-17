@@ -28,8 +28,10 @@ describe('CalculatorService', () => {
   it('should handle newlines between numbers as well as commas', () => {
     expect(service.add('1\n2,3')).toBe(6);
   });
-  
-  
 
+  it('should support different delimiters defined in the input', () => {
+    expect(service.add('//;\n1;2')).toBe(3);
+  });
+  
   
 });
