@@ -20,6 +20,11 @@ describe('CalculatorService', () => {
   it('should return the sum of two comma-separated numbers', () => {
     expect(service.add('1,2')).toBe(3);
   });
+
+  it('should handle multiple numbers', () => {
+    expect(service.add('1,2,3,4')).toBe(10);
+  });
+  
   
 
   
