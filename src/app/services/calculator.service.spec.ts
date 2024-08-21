@@ -63,6 +63,10 @@ describe('CalculatorService', () => {
       const largeInput = new Array(1000).fill('1').join(',');
       expect(service.add(largeInput)).toBe(1000);
     });
+
+    it('should sum only even numbers if delimiter contains "odd"', () => {
+      expect(service.add('//odd\n1odd2***3')).toBe(2);
+    });
   });
 
   describe('Error Handling', () => {

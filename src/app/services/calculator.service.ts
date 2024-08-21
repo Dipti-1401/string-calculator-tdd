@@ -10,14 +10,24 @@ export class CalculatorService {
 
   add(input: string): number {
     if (this.isEmpty(input)) return 0;
-
     const { delimiters, numbers } = this.parseInput(input);
     const numberList = this.splitStringIntoNumbers(numbers, delimiters);
-
-    this.validateNoNegativeNumbers(numberList);
-
-    return this.calculateSum(numberList);
+  
+    let filteredNumbers: number[];
+  
+    if (input.startsWith('//') && delimiters.toString().includes('odd')) {
+      filteredNumbers = numberList.filter(num => num % 2 === 0); 
+    } else {
+      filteredNumbers = numberList;
+    }
+  
+    console.log('Filtered Numbers:', filteredNumbers);
+  
+    this.validateNoNegativeNumbers(filteredNumbers);
+  
+    return this.calculateSum(filteredNumbers);
   }
+  
 
   private isEmpty(input: string): boolean {
     return !input || input.trim().length === 0;
@@ -27,7 +37,6 @@ export class CalculatorService {
     if (input.startsWith('//')) {
       const delimiterEnd = input.indexOf('\n');
       const delimiterSection = input.substring(2, delimiterEnd).trim();
-
       if (delimiterSection.startsWith('[') && !delimiterSection.endsWith(']')) {
         throw new Error(`Invalid delimiter section: ${delimiterSection}`);
       }
